@@ -11,11 +11,11 @@ const Signup = () => {
     password: '',
     confirmPassword: ''
   });
-  
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -68,7 +68,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -127,7 +127,7 @@ const Signup = () => {
               value={formData.username}
               onChange={handleChange}
               className={errors.username ? 'error' : ''}
-              placeholder="Enter username"
+              placeholder="Username"
             />
             {errors.username && <span className="error-text">{errors.username}</span>}
           </div>
@@ -141,7 +141,7 @@ const Signup = () => {
               value={formData.fullName}
               onChange={handleChange}
               className={errors.fullName ? 'error' : ''}
-              placeholder="Enter your full name"
+              placeholder="Full name"
             />
             {errors.fullName && <span className="error-text">{errors.fullName}</span>}
           </div>
@@ -155,7 +155,7 @@ const Signup = () => {
               value={formData.email}
               onChange={handleChange}
               className={errors.email ? 'error' : ''}
-              placeholder="Enter your email"
+              placeholder="Email"
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
@@ -169,7 +169,7 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               className={errors.password ? 'error' : ''}
-              placeholder="Enter password"
+              placeholder="Password"
             />
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
@@ -183,14 +183,14 @@ const Signup = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               className={errors.confirmPassword ? 'error' : ''}
-              placeholder="Confirm password"
+              placeholder="Confirm Password"
             />
             {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
           </div>
 
-          <button 
-            type="submit" 
-            className="signup-btn" 
+          <button
+            type="submit"
+            className="signup-btn"
             disabled={loading}
           >
             {loading ? 'Creating Account...' : 'Create Account'}
@@ -205,4 +205,4 @@ const Signup = () => {
   );
 };
 
-export default Signup; 
+export default Signup;

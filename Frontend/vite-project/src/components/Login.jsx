@@ -8,11 +8,11 @@ const Login = () => {
     username: '',
     password: ''
   });
-  
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -47,7 +47,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -104,7 +104,7 @@ const Login = () => {
               value={formData.username}
               onChange={handleChange}
               className={errors.username ? 'error' : ''}
-              placeholder="Enter your username"
+              placeholder="Username"
             />
             {errors.username && <span className="error-text">{errors.username}</span>}
           </div>
@@ -118,14 +118,14 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               className={errors.password ? 'error' : ''}
-              placeholder="Enter your password"
+              placeholder="Password"
             />
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
-          <button 
-            type="submit" 
-            className="login-btn" 
+          <button
+            type="submit"
+            className="login-btn"
             disabled={loading}
           >
             {loading ? 'Signing In...' : 'Sign In'}
@@ -140,4 +140,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;
