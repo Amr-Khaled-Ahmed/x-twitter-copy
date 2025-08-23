@@ -22,7 +22,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
       const response = await axios.get('/api/posts/all', {
         withCredentials: true
       });
-      
+
       if (response.data.success) {
         setPosts(response.data.posts);
       }
@@ -132,7 +132,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
       const postData = {
         text: newPost.trim()
       };
-      
+
       if (imgData) {
         postData.img = imgData;
       }
@@ -147,7 +147,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
         setImagePreview(null);
         const fileInput = document.getElementById('post-image-upload');
         if (fileInput) fileInput.value = '';
-        
+
         // Refresh posts
         fetchPosts();
         if (onPostCreated) onPostCreated();
@@ -165,16 +165,16 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
       const response = await axios.post(`/api/posts/like/${postId}`, {}, {
         withCredentials: true
       });
-      
+
       if (response.data.success) {
         // Update the post's like status locally
-        setPosts(prevPosts => 
+        setPosts(prevPosts =>
           prevPosts.map(post => {
             if (post._id === postId) {
               const isLiked = post.likes.includes(user._id);
               return {
                 ...post,
-                likes: isLiked 
+                likes: isLiked
                   ? post.likes.filter(id => id !== user._id)
                   : [...post.likes, user._id]
               };
@@ -213,7 +213,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
       const response = await axios.delete(`/api/posts/delete/${postId}`, {
         withCredentials: true
       });
-      
+
       if (response.data.success) {
         setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
         if (onPostDeleted) onPostDeleted();
@@ -227,18 +227,18 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
 
   const handleFollow = async (userId) => {
     if (!user) return;
-    
+
     setFollowLoading(prev => ({ ...prev, [userId]: true }));
-    
+
     try {
       const response = await axios.post(`/api/user/follow/${userId}`, {}, {
         withCredentials: true
       });
-      
+
       if (response.data.success) {
         const isCurrentlyFollowing = user.following?.includes(userId);
         const newFollowingStatus = !isCurrentlyFollowing;
-        
+
         // Call the callback to update the user state in Dashboard
         if (onFollowUpdate) {
           onFollowUpdate(userId, newFollowingStatus);
@@ -255,7 +255,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now - date) / (1000 * 60));
       return `${diffInMinutes}m`;
@@ -277,9 +277,9 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
       <div className="create-post-section">
         <div className="create-post-card">
           <div className="post-input-container">
-            <img 
-              src={user?.profileImg || 'https://via.placeholder.com/40'} 
-              alt="Profile" 
+            <img
+              src={user?.profileImg || 'https://via.placeholder.com/40'}
+              alt="Profile"
               className="user-avatar"
             />
             <div className="post-input-wrapper">
@@ -290,7 +290,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                 className="post-input"
                 rows="3"
               />
-              
+
               {imagePreview && (
                 <div className="image-preview-container">
                   <img src={imagePreview} alt="Preview" className="image-preview" />
@@ -301,7 +301,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                   </button>
                 </div>
               )}
-              
+
               <div className="post-actions">
                 <div className="post-attachments">
                   <input
@@ -318,7 +318,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                     </svg>
                   </label>
                 </div>
-                <button 
+                <button
                   className="post-submit-btn"
                   onClick={createPost}
                   disabled={isCreating || (!newPost.trim() && !postImage)}
@@ -341,9 +341,9 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
           posts.map((post, index) => (
             <div key={post._id} className="post-card">
               <div className="post-header">
-                <img 
-                  src={post.user?.profileImg || 'https://via.placeholder.com/40'} 
-                  alt="Profile" 
+                <img
+                  src={post.user?.profileImg || 'https://via.placeholder.com/40'}
+                  alt="Profile"
                   className="post-user-avatar"
                 />
                 <div className="post-user-info">
@@ -352,7 +352,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                   <div className="post-time">{formatDate(post.createdAt)}</div>
                 </div>
                 {post.user?._id !== user?._id && (
-                  <button 
+                  <button
                     className={`follow-btn ${user?.following?.includes(post.user?._id) ? 'following' : ''}`}
                     onClick={() => handleFollow(post.user?._id, index)}
                     disabled={followLoading[post.user?._id]}
@@ -367,7 +367,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                   </button>
                 )}
                 {post.user?._id === user?._id && (
-                  <button 
+                  <button
                     className="delete-post-btn"
                     onClick={() => handleDelete(post._id)}
                   >
@@ -377,7 +377,7 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                   </button>
                 )}
               </div>
-              
+
               <div className="post-content">
                 {post.isReshare && (
                   <div className="reshare-indicator">
@@ -394,9 +394,9 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                     </div>
                   )}
                 </div>
-              
+
               <div className="post-actions-bar">
-                <button 
+                <button
                   className={`action-btn like-btn ${post.likes.includes(user?._id) ? 'liked' : ''}`}
                   onClick={() => handleLike(post._id)}
                 >
@@ -405,8 +405,8 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
                   </svg>
                   <span>{post.likes.length}</span>
                 </button>
-                
-                <button 
+
+                <button
                   className="action-btn reshare-btn"
                   onClick={() => handleReshare(post._id)}
                 >
@@ -478,4 +478,4 @@ const Post = ({ user, onPostCreated, onPostDeleted, onFollowUpdate }) => {
   );
 };
 
-export default Post; 
+export default Post;
