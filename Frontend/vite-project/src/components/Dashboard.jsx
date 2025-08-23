@@ -9,12 +9,14 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
+  const [posts, setPosts] = useState([]);
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [followingUsers, setFollowingUsers] = useState([]);
   const [profileTab, setProfileTab] = useState('posts');
+  const [userPostsCount, setUserPostsCount] = useState(0);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -57,6 +59,28 @@ const Dashboard = () => {
     }
   }, [user?.following]);
 
+  // Fetch user posts count when user loads
+  useEffect(() => {
+    const fetchUserPostsCount = async () => {
+      if (user?.username) {
+        try {
+          const results = await axios.get(`http://localhost:5000/api/user/${user.username}`, {
+            withCredentials: true
+          });
+
+          if (results.data && results.data.posts) {
+            setUserPostsCount(results.data.posts.length);
+          }
+        } catch (error) {
+          console.error('Error fetching user posts count:', error);
+          setUserPostsCount(0);
+        }
+      }
+    };
+
+    fetchUserPostsCount();
+  }, [user?.username]);
+
   const handleLogout = async () => {
     try {
       await axios.post('/api/auth/logout', {}, {
@@ -70,10 +94,14 @@ const Dashboard = () => {
 
   const handlePostCreated = () => {
     console.log('Post created successfully');
+    // Update post count when a new post is created
+    setUserPostsCount(prev => prev + 1);
   };
 
   const handlePostDeleted = () => {
     console.log('Post deleted successfully');
+    // Update post count when a post is deleted
+    setUserPostsCount(prev => Math.max(0, prev - 1));
   };
 
   const handleFollowUpdate = async (userId, isFollowing) => {
@@ -119,27 +147,27 @@ const Dashboard = () => {
     }
   };
 
-const fetchFollowingUsers = async () => {
-  if (!user?.following || user.following.length === 0) {
-    setFollowingUsers([]);
-    return;
-  }
-
-  try {
-    const response = await axios.get('/api/user/users', {
-      withCredentials: true
-    });
-
-    if (response.data.success) {
-      const followingUserDetails = response.data.users.filter(userDetail =>
-        user.following.includes(userDetail._id)
-      );
-      setFollowingUsers(followingUserDetails);
+  const fetchFollowingUsers = async () => {
+    if (!user?.following || user.following.length === 0) {
+      setFollowingUsers([]);
+      return;
     }
-  } catch (error) {
-    console.error('Error fetching following users:', error);
-  }
-};
+
+    try {
+      const response = await axios.get('/api/user/users', {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        const followingUserDetails = response.data.users.filter(userDetail =>
+          user.following.includes(userDetail._id)
+        );
+        setFollowingUsers(followingUserDetails);
+      }
+    } catch (error) {
+      console.error('Error fetching following users:', error);
+    }
+  };
 
   const handleProfileImageUpload = (event) => {
     const file = event.target.files[0];
@@ -153,43 +181,42 @@ const fetchFollowingUsers = async () => {
     }
   };
 
-// Replace the handleUpdateProfileImage function with this:
-const handleUpdateProfileImage = async () => {
-  if (!profileImage) {
-    alert('Please select an image first');
-    return;
-  }
-
-  setUploading(true);
-  try {
-    const formData = new FormData();
-    formData.append('profilePicture', profileImage);
-
-    const response = await axios.put('/api/user/profile-picture', formData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    if (response.data.success) {
-      setUser(prev => ({
-        ...prev,
-        profileImg: response.data.profilePicture
-      }));
-      setProfileImage(null);
-      setImagePreview(null);
-      const fileInput = document.getElementById('profile-image-upload');
-      if (fileInput) fileInput.value = '';
-      alert('Profile picture updated successfully!');
+  const handleUpdateProfileImage = async () => {
+    if (!profileImage) {
+      alert('Please select an image first');
+      return;
     }
-  } catch (error) {
-    console.error('Error updating profile picture:', error);
-    alert('Error updating profile picture. Please try again.');
-  } finally {
-    setUploading(false);
-  }
-};
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('profilePicture', profileImage);
+
+      const response = await axios.put('/api/user/profile-picture', formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        setUser(prev => ({
+          ...prev,
+          profileImg: response.data.profilePicture
+        }));
+        setProfileImage(null);
+        setImagePreview(null);
+        const fileInput = document.getElementById('profile-image-upload');
+        if (fileInput) fileInput.value = '';
+        alert('Profile picture updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      alert('Error updating profile picture. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const removeProfileImage = () => {
     setProfileImage(null);
@@ -224,14 +251,12 @@ const handleUpdateProfileImage = async () => {
             <p className="trending-posts">8,547 posts</p>
           </div>
           <div className="trending-item">
-            <p className="trending-category">Technology · Trending</p>
+            <p className="trending-category">Technology • Trending</p>
             <h4 className="trending-topic">JavaScript</h4>
             <p className="trending-posts">25.1K posts</p>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 
@@ -345,13 +370,27 @@ const handleUpdateProfileImage = async () => {
                 >
                   Posts
                 </button>
-                <button
-                  className={`profile-tab ${profileTab === 'likes' ? 'active' : ''}`}
-                  onClick={() => setProfileTab('likes')}
-                >
-                  Likes
-                </button>
               </div>
+
+              {profileTab === 'posts' && (
+                <div>
+                  <Post
+                    user={user}
+                    onPostCreated={handlePostCreated}
+                    onPostDeleted={handlePostDeleted}
+                    onFollowUpdate={handleFollowUpdate}
+                    showOnlyUserPosts={true}
+                    profileUserId={user?._id}
+                    hideCreatePost={true}
+                  />
+                </div>
+              )}
+
+              {profileTab === 'likes' && (
+                <div className="no-posts">
+                  <p>Liked posts will appear here.</p>
+                </div>
+              )}
 
               {followingUsers.length > 0 && profileTab === 'posts' && (
                 <div className="following-section">
@@ -391,9 +430,6 @@ const handleUpdateProfileImage = async () => {
               </div>
             </div>
           )}
-
-
-
         </div>
       </div>
 
