@@ -363,16 +363,16 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="profile-tabs">
+              {/* <div className="profile-tabs">
                 <button
                   className={`profile-tab ${profileTab === 'posts' ? 'active' : ''}`}
                   onClick={() => setProfileTab('posts')}
                 >
                   Posts
                 </button>
-              </div>
+              </div> */}
 
-              {profileTab === 'posts' && (
+              {/* {profileTab === 'posts' && (
                 <div>
                   <Post
                     user={user}
@@ -384,7 +384,7 @@ const Dashboard = () => {
                     hideCreatePost={true}
                   />
                 </div>
-              )}
+              )} */}
 
               {profileTab === 'likes' && (
                 <div className="no-posts">
@@ -437,5 +437,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
